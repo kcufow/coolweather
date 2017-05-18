@@ -6,10 +6,13 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -61,6 +64,11 @@ public class WeatherActivity extends AppCompatActivity {
     ScrollView weatherLayout;
     @InjectView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefresh;
+    @InjectView(R.id.nav_button)
+    Button navButton;
+
+    @InjectView(R.id.draw_layout)
+    DrawerLayout drawLayout;
 
 
     @Override
@@ -85,7 +93,7 @@ public class WeatherActivity extends AppCompatActivity {
             showWeatherInfo(weather);
         } else {
 
-             weatherId = getIntent().getStringExtra(WEATHER_ID);
+            weatherId = getIntent().getStringExtra(WEATHER_ID);
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
 
@@ -100,6 +108,12 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 requestWeather(weatherId);
+            }
+        });
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawLayout.openDrawer(GravityCompat.START);
             }
         });
 
@@ -131,7 +145,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     }
 
-    private void requestWeather(String weatherId) {
+    public void requestWeather(String weatherId) {
         String weatherUrl = Constant.weatherBaseUrl + weatherId + Constant.key;
         Httputil.sendOkHttpREquest(weatherUrl, new Callback() {
             @Override
@@ -140,7 +154,7 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                 swipeRefresh.setRefreshing(false);
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -162,7 +176,7 @@ public class WeatherActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                         }
-                            swipeRefresh.setRefreshing(false);
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
 
