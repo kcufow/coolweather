@@ -8,7 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
     <style name="WeatherTheme" parent="AppTheme">
-
+        <item name="android:statusBarColor">@android:color/transparent</item>
 
     </style>
+
+
 </resources>
