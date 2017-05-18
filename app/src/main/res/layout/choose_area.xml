@@ -3,8 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#fff">
+    android:background="#fff"
+    android:fitsSystemWindows="true">
     <RelativeLayout
+        android:fitsSystemWindows="true"
         android:background="?attr/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
@@ -26,9 +28,11 @@
 
 
     </RelativeLayout>
+
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
 
 </LinearLayout>

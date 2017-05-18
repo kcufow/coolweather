@@ -69,6 +69,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     @InjectView(R.id.draw_layout)
     DrawerLayout drawLayout;
+    private String weatherId;
 
 
     @Override
@@ -86,7 +87,8 @@ public class WeatherActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString(Constant.WEATHER_STRING, null);
         String bingPic = prefs.getString(Constant.BING_PIC, null);
-        final String weatherId;
+
+
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
             weatherId = weather.basic.weatherId;
@@ -98,6 +100,7 @@ public class WeatherActivity extends AppCompatActivity {
             requestWeather(weatherId);
 
         }
+
         if (bingPic != null) {
             Glide.with(this).load(bingPic).into(bingPicImage);
 
@@ -146,6 +149,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void requestWeather(String weatherId) {
+
         String weatherUrl = Constant.weatherBaseUrl + weatherId + Constant.key;
         Httputil.sendOkHttpREquest(weatherUrl, new Callback() {
             @Override
@@ -157,6 +161,7 @@ public class WeatherActivity extends AppCompatActivity {
                         swipeRefresh.setRefreshing(false);
                     }
                 });
+
             }
 
             @Override
@@ -184,11 +189,11 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
         loadBingPic();
+        this.weatherId =weatherId;
     }
 
     private void showWeatherInfo(Weather weather) {
         if (weather!=null&& "ok".equals(weather.status)){
-
 
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
