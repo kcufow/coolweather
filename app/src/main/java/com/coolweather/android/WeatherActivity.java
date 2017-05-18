@@ -1,6 +1,7 @@
 package com.coolweather.android;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.Forecast;
 import com.coolweather.android.gson.Weather;
+import com.coolweather.android.service.AutoUpdateService;
 import com.coolweather.android.util.Httputil;
 import com.coolweather.android.util.Utility;
 
@@ -35,9 +37,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
-    public static final String WEATHER_STRING = "weather";
-    public static final String WEATHER_ID = "weather_id";
-    public static final String BING_PIC = "bingPic";
+
     @InjectView(R.id.bing_pic_image)
     ImageView bingPicImage;
     @InjectView(R.id.title_city)
@@ -84,8 +84,8 @@ public class WeatherActivity extends AppCompatActivity {
 
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString(WeatherActivity.WEATHER_STRING, null);
-        String bingPic = prefs.getString(BING_PIC, null);
+        String weatherString = prefs.getString(Constant.WEATHER_STRING, null);
+        String bingPic = prefs.getString(Constant.BING_PIC, null);
         final String weatherId;
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
@@ -93,7 +93,7 @@ public class WeatherActivity extends AppCompatActivity {
             showWeatherInfo(weather);
         } else {
 
-            weatherId = getIntent().getStringExtra(WEATHER_ID);
+            weatherId = getIntent().getStringExtra(Constant.WEATHER_ID);
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
 
@@ -131,7 +131,7 @@ public class WeatherActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 final String bingPic = response.body().string();
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putString(BING_PIC, bingPic);
+                editor.putString(Constant.BING_PIC, bingPic);
                 editor.apply();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -170,7 +170,7 @@ public class WeatherActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = PreferenceManager
                                     .getDefaultSharedPreferences(WeatherActivity.this)
                                     .edit();
-                            editor.putString(WEATHER_STRING, responseText);
+                            editor.putString(Constant.WEATHER_STRING, responseText);
                             editor.apply();
                             showWeatherInfo(weather);
                         } else {
@@ -187,6 +187,9 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(Weather weather) {
+        if (weather!=null&& "ok".equals(weather.status)){
+
+
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
@@ -220,6 +223,12 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, AutoUpdateService.class);
+                startService(intent);
+
+    }else {
+            Toast.makeText(this, "天气获取失败", Toast.LENGTH_SHORT).show();
+        }
 
     }
 }
